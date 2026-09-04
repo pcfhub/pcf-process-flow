@@ -461,6 +461,46 @@ check(
 );
 
 /*
+ * **The bar must move on the click itself, with no updateView behind it.**
+ *
+ * This is the one the local suite originally missed, because `mount()` calls
+ * `updateView` once and every assertion below ran after one. The control only
+ * repainted inside `updateView`, so it depended on the host handing the write
+ * straight back — a model-driven form does, which is why it looked correct
+ * everywhere it was developed, and PCFHub's demo harness does not: it renders
+ * `getOutputs()` beside the control without re-rendering it. Reported from the
+ * published demo as "the output shows the new value but the control does not
+ * mark".
+ *
+ * So this asserts the DOM *without* an intervening render, deliberately.
+ */
+const immediate = mount({ value: [1] });
+
+clickStep(immediate, 2);
+
+check(
+    'clicking repaints the bar without waiting for the host to call updateView',
+    JSON.stringify(states(immediate)) === JSON.stringify(['done', 'future', 'current', 'future']),
+    JSON.stringify(states(immediate)),
+);
+
+const immediateSingle = mount({ value: 1, columnType: 'picklist' });
+
+clickStep(immediateSingle, 3);
+
+check(
+    'and on a single-select column too',
+    JSON.stringify(states(immediateSingle)) === JSON.stringify(['done', 'done', 'done', 'current']),
+    JSON.stringify(states(immediateSingle)),
+);
+
+check(
+    'the repaint does not need a second notification to have happened',
+    immediate.notifications() === 1,
+    String(immediate.notifications()),
+);
+
+/*
  * `updateView` runs on every change to any bound value on the form, including
  * the echo of this control's own write — and a render that arrives BEFORE the
  * platform has committed carries the old value. Overwriting the selection there

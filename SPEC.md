@@ -53,6 +53,25 @@ That is the standing limit of this suite, and the argument for keeping
 `dev/shot.html` — the published images are captured from the real bundle, so a
 regression in any of this shows up in a file somebody reviews.
 
+**A control that only repaints inside `updateView` depends on the host to hand
+the write back, and not every host does.** Reported from the published demo:
+clicking a stage showed the new value in the outputs panel and the bar did not
+move. `getOutputs()` was correct throughout — the DOM simply never got
+repainted, because the only thing that repainted it was `updateView`, and
+PCFHub's demo harness renders `getOutputs()` beside the control without
+re-rendering it.
+
+A model-driven form *does* call back, which is what makes this the shape of bug
+that ships: it is correct on the host you develop on, and the local suite missed
+it for the same reason — `mount()` calls `updateView` once, so every assertion
+ran after one. `paint()` now takes no context and runs from the click as well,
+with the data it needs snapshotted as plain fields in `render()`. Holding the
+context object instead would be the other bug: the platform hands it over for
+the duration of one call.
+
+The assertions that pin it read the DOM with no intervening render, deliberately.
+
+
 ## Platform behaviour worth knowing
 
 **`property.type` cannot tell the two choice column types apart, and

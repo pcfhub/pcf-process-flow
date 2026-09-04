@@ -1,6 +1,6 @@
 {
   "name": "pcf-process-flow",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A choice column as a Business Process Flow stage bar.",
   "license": "MIT",
   "private": true,

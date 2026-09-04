@@ -7,7 +7,7 @@
   -->
   <control namespace="PCFHub"
            constructor="ProcessFlow"
-           version="0.1.1"
+           version="0.1.2"
            display-name-key="ProcessFlow_Name"
            description-key="ProcessFlow_Desc"
            control-type="standard">

@@ -109,6 +109,18 @@ export class ProcessFlow implements ComponentFramework.StandardControl<IInputs, 
     /** Seeded silently on first render, so arriving on a form announces nothing. */
     private lastAnnounced: string | undefined = undefined;
 
+    /*
+     * Everything `paint()` needs out of `context`, snapshotted as plain data in
+     * `render()`. `paint()` also runs from a click, where there is no context to
+     * read — and holding the object itself would be worse: the platform hands it
+     * over for one call and nothing promises it still describes the form after.
+     */
+    private visible: ComponentFramework.PropertyHelper.OptionMetadata[] = [];
+    private fallbackColor = DEFAULT_COLOR;
+    private trackLabel = '';
+    private hasError = false;
+    private errorMessage = '';
+
     public init(
         context: ComponentFramework.Context<IInputs>,
         notifyOutputChanged: () => void,
@@ -227,15 +239,6 @@ export class ProcessFlow implements ComponentFramework.StandardControl<IInputs, 
             this.selected = toSelection(parameter.raw);
         }
 
-        // Re-split every render, not only when the column changed: the maker can
-        // edit the exclude list, which moves a value between the two halves
-        // without the column moving at all.
-        this.preserved = preservedSelection(visible, this.selected);
-
-        const hidden = new Set(this.preserved);
-
-        this.visibleSelection = this.selected.filter((value) => !hidden.has(value));
-
         if (visible.length === 0) {
             this.track.hidden = true;
             this.message.hidden = false;
@@ -246,24 +249,22 @@ export class ProcessFlow implements ComponentFramework.StandardControl<IInputs, 
         }
 
         this.track.hidden = false;
-        this.steps = resolveSteps(
-            visible,
-            this.visibleSelection,
-            this.arity,
-            normaliseColor(context.parameters.defaultColor.raw) ?? DEFAULT_COLOR,
-        );
 
-        // Rebuilding the DOM on every render would throw away focus mid-tab and
-        // re-run the layout for nothing, and `updateView` runs constantly. The
-        // element list only has to change when the steps themselves do.
-        const shape = this.steps.map((step) => `${step.value}:${step.label}:${step.color}`).join('|');
+        /*
+         * Everything `paint()` needs, snapshotted as plain data.
+         *
+         * `paint()` deliberately takes no context, because it also runs from a
+         * click — see `activate`. Holding the context object itself and reading
+         * it later is the thing to avoid: it is handed over for the duration of
+         * one call, and nothing promises it still describes the form afterwards.
+         */
+        this.visible = visible;
+        this.fallbackColor = normaliseColor(context.parameters.defaultColor.raw) ?? DEFAULT_COLOR;
+        this.trackLabel = context.mode.label || this.resources.getString('ProcessFlow_Name');
+        this.hasError = parameter.error;
+        this.errorMessage = parameter.error ? parameter.errorMessage : '';
 
-        if (shape !== this.lastShape) {
-            this.lastShape = shape;
-            this.build();
-        }
-
-        this.paint(context);
+        this.paint();
     }
 
     /** Rebuild the step elements. Only called when the step list itself changed. */
@@ -303,8 +304,44 @@ export class ProcessFlow implements ComponentFramework.StandardControl<IInputs, 
     }
 
     /** Re-apply everything that changes without the step list changing. */
-    private paint(context: ComponentFramework.Context<IInputs>): void {
-        const parameter = boundValue(context);
+    /**
+     * Re-derive the bar from `this.selected` and apply it to the DOM.
+     *
+     * **Takes no context on purpose: this also runs from a click.** A control
+     * that only repaints inside `updateView` is depending on the host to hand
+     * the write straight back, and not every host does — the hub's demo harness
+     * reads `getOutputs()` and renders the value beside the control without
+     * calling `updateView` at all, so the bar reported the right answer and
+     * never moved. A model-driven form does call back, which is exactly what
+     * makes this the kind of bug that ships: it works on the host you develop
+     * on. Reflecting the user's own interaction is the control's job either way,
+     * and waiting a round trip for it is worse even where the round trip comes.
+     */
+    private paint(): void {
+        // Re-split every paint, not only when the column changed: the maker can
+        // edit the exclude list, which moves a value between the two halves
+        // without the column moving at all — and a click moves one too.
+        this.preserved = preservedSelection(this.visible, this.selected);
+
+        const hidden = new Set(this.preserved);
+
+        this.visibleSelection = this.selected.filter((value) => !hidden.has(value));
+        this.steps = resolveSteps(
+            this.visible,
+            this.visibleSelection,
+            this.arity,
+            this.fallbackColor,
+        );
+
+        // Rebuilding the DOM every time would throw away focus mid-tab and
+        // re-run the layout for nothing, and `updateView` runs constantly. The
+        // element list only has to change when the steps themselves do.
+        const shape = this.steps.map((step) => `${step.value}:${step.label}:${step.color}`).join('|');
+
+        if (shape !== this.lastShape) {
+            this.lastShape = shape;
+            this.build();
+        }
 
         // A multi-select column is a set of independent toggles; a Choice
         // column is one-of-N. Real semantics rather than clickable divs, so the
@@ -314,10 +351,7 @@ export class ProcessFlow implements ComponentFramework.StandardControl<IInputs, 
         // `mode.label` is the label the maker gave the field on this form, which
         // is a better accessible name than anything shipped in the .resx. The
         // resource string is the fallback, not the default.
-        this.track.setAttribute(
-            'aria-label',
-            context.mode.label || this.resources.getString('ProcessFlow_Name'),
-        );
+        this.track.setAttribute('aria-label', this.trackLabel);
 
         // The current stage is the one worth landing on when tabbing in.
         const current = this.steps.findIndex((step) => step.state === 'current');
@@ -364,11 +398,11 @@ export class ProcessFlow implements ComponentFramework.StandardControl<IInputs, 
             item.classList.toggle('is-linked', marked);
         });
 
-        this.container.classList.toggle('ProcessFlow--invalid', parameter.error);
-        this.track.setAttribute('aria-invalid', String(parameter.error));
+        this.container.classList.toggle('ProcessFlow--invalid', this.hasError);
+        this.track.setAttribute('aria-invalid', String(this.hasError));
 
-        this.message.hidden = !parameter.error;
-        this.message.textContent = parameter.error ? parameter.errorMessage : '';
+        this.message.hidden = !this.hasError;
+        this.message.textContent = this.errorMessage;
 
         this.announce();
     }
@@ -505,8 +539,14 @@ export class ProcessFlow implements ComponentFramework.StandardControl<IInputs, 
             return;
         }
 
-        this.visibleSelection = next;
         this.selected = [...this.preserved, ...next];
+
+        // Repaint from the control's own state, before telling the platform.
+        // Waiting for `updateView` to come back makes the bar depend on the
+        // host choosing to round-trip the write — and a host that reads
+        // `getOutputs()` without re-rendering leaves the value correct and the
+        // bar frozen.
+        this.paint();
 
         // `lastIncoming` is deliberately NOT touched here. It records what the
         // *platform* last supplied, so a render that arrives before the write
