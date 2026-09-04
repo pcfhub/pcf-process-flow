@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Process Flow — capture</title>
+        <!--
+            The page media/screenshot.png is taken from.
+
+            It mounts the real built control the same way `harness.html` does —
+            same bundle, same stylesheet, same `dev/host.js` context — so the
+            image cannot drift from what the control actually renders. A
+            screenshot assembled in a drawing tool can, and does.
+
+                npm run build
+                node dev/serve.js --port 8792 --no-open &
+                chrome --headless --disable-gpu --hide-scrollbars \
+                  --screenshot=media/screenshot.png --window-size=880,470 \
+                  --default-background-color=00000000 \
+                  http://localhost:8792/dev/shot.html
+
+            `?panel=logo` renders the single bar used for media/logo.png at
+            --window-size=512,512 instead.
+        -->
+        <link rel="stylesheet" href="../out/controls/ProcessFlow/css/ProcessFlow.css" />
+        <style>
+            :root { color-scheme: light; }
+
+            body {
+                margin: 0;
+                padding: 24px;
+                background: #ffffff;
+                font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+            }
+
+            .shot-grid {
+                display: grid;
+                gap: 18px;
+            }
+
+            /* A form section, so the bar is shown at the width it really gets. */
+            .shot-case {
+                box-sizing: border-box;
+                padding: 12px 16px 14px;
+                border: 1px solid #e0e0e0;
+                border-radius: 6px;
+                background: #ffffff;
+            }
+
+            .shot-case.is-dark {
+                border-color: #3d3d3d;
+                background: #292929;
+            }
+
+            .shot-caption {
+                margin: 0 0 8px;
+                color: #616161;
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+            }
+
+            .shot-case.is-dark .shot-caption { color: #adadad; }
+
+            .shot-label {
+                display: block;
+                margin-bottom: 6px;
+                color: #242424;
+                font-size: 12px;
+            }
+
+            .shot-case.is-dark .shot-label { color: #ffffff; }
+
+            body.is-logo { padding: 0; background: transparent; }
+
+            body.is-logo .shot-case {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 512px;
+                height: 512px;
+                padding: 0;
+                border: none;
+            }
+
+            body.is-logo .shot-caption,
+            body.is-logo .shot-label { display: none; }
+
+            body.is-logo .shot-mount { width: 424px; }
+
+            body.is-logo .ProcessFlow {
+                --ProcessFlow-marker: 60px;
+                --ProcessFlow-rail-width: 10px;
+                --ProcessFlow-node-padding-top: 0px;
+            }
+
+            /* No labels, so the node's own spacing would push the bar off centre. */
+            body.is-logo .ProcessFlow-node { gap: 0; padding: 0; }
+            body.is-logo .ProcessFlow-label { display: none; }
+            body.is-logo .ProcessFlow-check { width: 30px; height: 30px; }
+
+            body.is-logo .ProcessFlow-node--current .ProcessFlow-marker::after {
+                width: 22px;
+                height: 22px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="shot-grid" id="shot-grid"></div>
+
+        <!--
+            Order matters. The bundle registers itself the moment it loads, so
+            shot.js has to be in place to catch the registration first — the
+            same reason harness.js loads before the bundle.
+        -->
+        <script src="host.js"></script>
+        <script src="shot.js"></script>
+        <script src="../out/controls/ProcessFlow/bundle.js"></script>
+        <script>window.__shotStart();</script>
+    </body>
+</html>

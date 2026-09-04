@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <!--
+    The version here is what the Power Platform upgrades on, and the release
+    workflow refuses to publish a tag that disagrees with it. Bump this in the
+    same commit as the tag.
+  -->
+  <control namespace="PCFHub"
+           constructor="ProcessFlow"
+           version="0.1.1"
+           display-name-key="ProcessFlow_Name"
+           description-key="ProcessFlow_Desc"
+           control-type="standard">
+
+    <external-service-usage enabled="false" />
+
+    <!--
+      ONE bound property, accepting either kind of choice column.
+
+      A field control binds its *first* bound property to the column it is
+      placed on, and renders every additional bound property as its own column
+      picker in the configuration pane. So "one optional property per column
+      type" is not an option here: the maker would choose a field and then be
+      asked to choose a second one, for a control that attaches to exactly one
+      column. pcf-choices-picker shipped that shape, had it reported from a
+      real environment, and reverted to this.
+
+      A type-group is the only shape that accepts both column types through a
+      single binding. It costs the specific generated type — pcf-scripts emits
+      a type-grouped property as the base `Property`, so `raw` is `any` and
+      `attributes` is the base `Metadata` — and both are narrowed once, at the
+      boundary, in options.ts.
+
+      Both arities are supported and they mean different things:
+
+        - A Multi-Select Choice column marks several steps. The last marked one
+          in option order is the current stage; earlier marked ones are done.
+        - A Choice column marks one. That one is the current stage, and every
+          option before it in option order renders as done — which is how a
+          native business process flow reads.
+    -->
+    <type-group name="choicecolumn">
+      <type>OptionSet</type>
+      <type>MultiSelectOptionSet</type>
+    </type-group>
+
+    <property name="value"
+              display-name-key="Value_Name"
+              description-key="Value_Desc"
+              of-type-group="choicecolumn"
+              usage="bound"
+              required="true" />
+
+    <!--
+      The step list, and their order.
+
+      In a model-driven app the platform supplies it as
+      `value.attributes.Options`, already in the display order the maker set in
+      the choice editor — which is where the step order comes from. `attributes`
+      is optional on the platform's own property types, and a host with no
+      column metadata has none, so this input is the only source in a canvas app
+      and in PCFHub's demo harness. When non-empty it wins, so a maker can
+      relabel, recolour or reorder the steps without touching the column.
+
+      Two accepted shapes. ComponentFramework.PropertyHelper.OptionMetadata
+      verbatim:
+
+          [{"Value":1,"Label":"Qualify","Color":"#E8502A"}]
+
+      or the shorthand, where the colour is optional:
+
+          1:Qualify:#E8502A, 2:Develop, 3:Propose
+    -->
+    <property name="options"
+              display-name-key="Options_Name"
+              description-key="Options_Desc"
+              of-type="Multiple"
+              usage="input"
+              required="false" />
+
+    <!--
+      Steps to leave off the bar, comma separated.
+
+      An entry that parses as a number matches the option's Value; anything else
+      matches its Label, trimmed and case-insensitively. Both are accepted
+      because makers think in labels and integrators think in values:
+
+          Cancelled, On hold        or        100000004, 100000005
+
+      An excluded option that the record already holds is hidden but NOT
+      discarded: it is preserved through every write-back. Hiding a step from
+      the bar is a display decision, and it should never delete data.
+    -->
+    <property name="exclude"
+              display-name-key="Exclude_Name"
+              description-key="Exclude_Desc"
+              of-type="SingleLine.Text"
+              usage="input"
+              required="false" />
+
+    <!--
+      The colour for an option whose choice metadata carries none — which is
+      most of them, since a colour is optional in the choice editor. Dataverse's
+      own default is the business-process-flow orange.
+    -->
+    <property name="defaultColor"
+              display-name-key="DefaultColor_Name"
+              description-key="DefaultColor_Desc"
+              of-type="SingleLine.Text"
+              usage="input"
+              required="false"
+              default-value="#E8502A" />
+
+    <resources>
+      <code path="index.ts" order="1" />
+      <css path="css/ProcessFlow.css" order="1" />
+      <!--
+        THE ORDER IS DELIBERATE AND 1033 GOES LAST. `pcf-start` picks the .resx
+        by manifest order rather than by locale — it reads whichever file is
+        listed *last* and ignores the LCID and the browser language entirely.
+        The platform itself ignores the order completely, so `npm start` is the
+        only thing that reads it.
+
+        ADD A NEW LANGUAGE ABOVE THIS LINE, not below it.
+      -->
+      <resx path="strings/ProcessFlow.3082.resx" version="1.0.0" />
+      <resx path="strings/ProcessFlow.1036.resx" version="1.0.0" />
+      <resx path="strings/ProcessFlow.1031.resx" version="1.0.0" />
+      <resx path="strings/ProcessFlow.1041.resx" version="1.0.0" />
+      <resx path="strings/ProcessFlow.1033.resx" version="1.0.0" />
+    </resources>
+
+    <!--
+      No feature-usage on purpose. This control renders a bound column and
+      writes it back — no WebAPI, no Utility, no device, no navigation. That
+      absence is what lets the hub run it as a full-fidelity demo, and each
+      entry here would also be a permission prompt for the maker installing it.
+    -->
+  </control>
+</manifest>

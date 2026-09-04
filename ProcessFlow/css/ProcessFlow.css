@@ -1,0 +1,421 @@
+/*
+ * Everything is scoped under .ProcessFlow, the custom property declarations
+ * included. A code component shares a document with the host app and with every
+ * other control on the form, and the platform does not sandbox it — a bare
+ * `button { … }` here would restyle the page the control was dropped onto.
+ *
+ * Colours are Fluent design tokens with literal fallbacks. A model-driven form
+ * already mounts a FluentProvider above every code component, and that provider
+ * emits the theme as CSS custom properties on its own wrapper — so a standard
+ * (non-React) control reads them without mounting anything. The token wins where
+ * the host publishes it, so the control follows the app's theme and its brand
+ * colour for free; the literal carries canvas apps and PCFHub's demo harness,
+ * which publish nothing.
+ */
+.ProcessFlow {
+    --ProcessFlow-foreground: var(--colorNeutralForeground1, #242424);
+    --ProcessFlow-foreground-muted: var(--colorNeutralForeground4, #707070);
+    --ProcessFlow-foreground-disabled: var(--colorNeutralForegroundDisabled, #bdbdbd);
+    --ProcessFlow-surface: var(--colorNeutralBackground1, #ffffff);
+    --ProcessFlow-rail: var(--colorNeutralStroke1, #d1d1d1);
+    --ProcessFlow-rail-disabled: var(--colorNeutralStrokeDisabled, #e0e0e0);
+    --ProcessFlow-invalid: var(--colorPaletteRedForeground1, #bc2f32);
+    --ProcessFlow-focus-outer: var(--colorStrokeFocus2, #000000);
+    --ProcessFlow-focus-inner: var(--colorStrokeFocus1, #ffffff);
+    --ProcessFlow-radius: var(--borderRadiusMedium, 4px);
+    --ProcessFlow-font-size: var(--fontSizeBase300, 14px);
+    --ProcessFlow-line-height: var(--lineHeightBase300, 20px);
+    --ProcessFlow-duration: var(--durationNormal, 200ms);
+    --ProcessFlow-curve: var(--curveEasyEase, cubic-bezier(0.33, 0, 0.67, 1));
+
+    /* The marker diameter, and the rail thickness derived from it. */
+    --ProcessFlow-marker: 22px;
+    --ProcessFlow-rail-width: 4px;
+    /*
+     * Named because the connector's vertical position is measured from it. Two
+     * places, and they have to agree or the rail misses the circle's centre.
+     */
+    --ProcessFlow-node-padding-top: 2px;
+
+    /*
+     * Per step, written by index.ts from the option's own colour. Declared here
+     * so a step that somehow never receives one still resolves to the business
+     * process flow orange rather than to nothing.
+     */
+    --ProcessFlow-step-color: #e8502a;
+    --ProcessFlow-step-glyph: #ffffff;
+
+    color: var(--ProcessFlow-foreground);
+    font-family: inherit;
+    font-size: var(--ProcessFlow-font-size);
+    line-height: var(--ProcessFlow-line-height);
+}
+
+/*
+ * `element.hidden = true` works through a UA rule `[hidden] { display: none }`,
+ * and ANY author `display` declaration beats it on specificity. The track and
+ * the steps below both get a `display`, so without this the moment the control
+ * hides the track — the field-level-security branch, which is the one nobody
+ * exercises — it would render an empty bar where "you may not see this value"
+ * should be.
+ */
+.ProcessFlow [hidden] {
+    display: none !important;
+}
+
+.ProcessFlow--hidden {
+    display: none;
+}
+
+/* ------------------------------------------------------------------- track */
+
+.ProcessFlow .ProcessFlow-track {
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ProcessFlow .ProcessFlow-step {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/*
+ * The connector is a pseudo-element on each step after the first, running from
+ * this step's marker back to the previous one — so it spans centre to centre
+ * and both ends finish underneath a circle rather than beside it.
+ *
+ * `inset-inline-end` rather than `right`: under RTL the whole row reverses, and
+ * the logical property follows it without a second rule.
+ *
+ * **`z-index: 0` is load-bearing, and the bug it fixes is not obvious.** This
+ * element reaches back across the PREVIOUS step's box, and it comes after that
+ * step's button in tree order — so with both at the same z-index the rail
+ * painted straight over the previous circle, a line through the middle of every
+ * marker but the last. Ranking the buttons above every connector fixes it for
+ * all pairs at once, which tree order cannot: no amount of reordering puts one
+ * element both before and after its neighbours.
+ */
+.ProcessFlow .ProcessFlow-step + .ProcessFlow-step::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset-inline-end: 50%;
+    /*
+     * Centred on the marker, which sits below the node's own top padding — so
+     * that padding is part of the sum. Leaving it out is a 2px rise, enough for
+     * the rail to leave the circle visibly off-centre without looking like a
+     * measurement error.
+     */
+    top: calc(
+        var(--ProcessFlow-node-padding-top)
+        + (var(--ProcessFlow-marker) - var(--ProcessFlow-rail-width)) / 2
+    );
+    width: 100%;
+    height: var(--ProcessFlow-rail-width);
+    background-color: var(--ProcessFlow-rail);
+    transition: background-color var(--ProcessFlow-duration) var(--ProcessFlow-curve);
+}
+
+/*
+ * A segment is filled when the step it leads INTO has been reached — so the
+ * rail runs solid up to the current stage and grey beyond it, which is what
+ * makes the bar readable at a glance, and so the segment takes the colour of
+ * the step it arrives at.
+ *
+ * `is-linked` and `--ProcessFlow-step-color` are both written by index.ts onto
+ * the <li>, not the button. A sibling selector cannot express "reached", and a
+ * custom property set on the button cannot be read by the <li>'s own
+ * pseudo-element — properties inherit downward only.
+ */
+.ProcessFlow .ProcessFlow-step.is-linked::before {
+    background-color: var(--ProcessFlow-step-color);
+}
+
+/* -------------------------------------------------------------------- node */
+
+.ProcessFlow .ProcessFlow-node {
+    position: relative;
+    /* Above every connector — see the note on the connector above. */
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    padding: var(--ProcessFlow-node-padding-top) 4px 4px;
+    border: none;
+    border-radius: var(--ProcessFlow-radius);
+    background-color: transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    cursor: pointer;
+}
+
+.ProcessFlow .ProcessFlow-node:disabled {
+    cursor: default;
+}
+
+/*
+ * The nodes are buttons rather than something inside a field surface, so they
+ * take Fluent's focus RING rather than its underline: a dark ring with a light
+ * one immediately inside it, which survives on either background.
+ *
+ * `:focus-visible`, not `:focus` — a mouse click should leave nothing behind.
+ */
+.ProcessFlow .ProcessFlow-node:focus-visible {
+    outline: 2px solid var(--ProcessFlow-focus-outer);
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 4px var(--ProcessFlow-focus-inner);
+}
+
+/* ------------------------------------------------------------------ marker */
+
+.ProcessFlow .ProcessFlow-marker {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: var(--ProcessFlow-marker);
+    height: var(--ProcessFlow-marker);
+    border: var(--ProcessFlow-rail-width) solid var(--ProcessFlow-rail);
+    border-radius: 50%;
+    /* The step sits on the form, so the rail must not show through the middle. */
+    background-color: var(--ProcessFlow-surface);
+    transition:
+        background-color var(--ProcessFlow-duration) var(--ProcessFlow-curve),
+        border-color var(--ProcessFlow-duration) var(--ProcessFlow-curve);
+}
+
+/*
+ * 12px inside a 14px opening — the marker is 22px with a 4px border. Drawn at
+ * the size Fluent cut it for, so the stroke weight is the one the glyph was
+ * designed with rather than a scaled approximation of it.
+ */
+.ProcessFlow .ProcessFlow-check {
+    display: none;
+    width: 12px;
+    height: 12px;
+    fill: var(--ProcessFlow-step-glyph);
+}
+
+/*
+ * Three states, and each differs by SHAPE as well as by colour: a filled disc
+ * with a tick, a filled ring with a hollow centre, an empty outline. That is
+ * what carries the meaning to a forced-colours user, where every tint collapses
+ * to a system keyword, and to anyone who cannot distinguish the hues.
+ */
+.ProcessFlow .ProcessFlow-node--done .ProcessFlow-marker {
+    border-color: var(--ProcessFlow-step-color);
+    background-color: var(--ProcessFlow-step-color);
+}
+
+.ProcessFlow .ProcessFlow-node--done .ProcessFlow-check {
+    display: block;
+}
+
+.ProcessFlow .ProcessFlow-node--current .ProcessFlow-marker {
+    border-color: var(--ProcessFlow-step-color);
+    background-color: var(--ProcessFlow-surface);
+}
+
+/* The dot inside the ring — the target mark the native flow uses. */
+.ProcessFlow .ProcessFlow-node--current .ProcessFlow-marker::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--ProcessFlow-step-color);
+}
+
+.ProcessFlow .ProcessFlow-node--future .ProcessFlow-marker {
+    border-color: var(--ProcessFlow-rail);
+    background-color: var(--ProcessFlow-surface);
+}
+
+.ProcessFlow .ProcessFlow-node:not(:disabled):hover .ProcessFlow-marker {
+    border-color: var(--ProcessFlow-step-color);
+}
+
+/* ------------------------------------------------------------------- label */
+
+.ProcessFlow .ProcessFlow-label {
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--ProcessFlow-foreground-muted);
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+ * The current stage's label sits in the chevron-shaped tab the native flow
+ * uses. `clip-path` rather than borders: it costs one declaration, needs no
+ * extra elements, and degrades to a plain rectangle where it is unsupported.
+ *
+ * The horizontal padding leaves room for the chevron's point, so the text does
+ * not run into the angled edge.
+ */
+.ProcessFlow .ProcessFlow-node--current .ProcessFlow-label {
+    padding: 2px 14px;
+    background-color: var(--colorNeutralBackground3, #f5f5f5);
+    color: var(--ProcessFlow-foreground);
+    font-weight: var(--fontWeightSemibold, 600);
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%, 8px 50%);
+}
+
+/*
+ * Setting `dir` reverses the flex row, but it does not turn the chevron around
+ * — it would keep pointing the way the text no longer runs. Mirroring the clip
+ * is the whole fix, and it is keyed off any right-to-left ancestor rather than
+ * the control's own element, because a host form in a right-to-left language
+ * sets `dir` higher up than this control does.
+ */
+[dir="rtl"] .ProcessFlow .ProcessFlow-node--current .ProcessFlow-label {
+    clip-path: polygon(100% 0, 8px 0, 0 50%, 8px 100%, 100% 100%, calc(100% - 8px) 50%);
+}
+
+/* ----------------------------------------------------------------- message */
+
+.ProcessFlow .ProcessFlow-message {
+    margin: 4px 0 0;
+    color: var(--ProcessFlow-foreground-muted);
+    font-size: var(--fontSizeBase200, 12px);
+    line-height: var(--lineHeightBase200, 16px);
+}
+
+.ProcessFlow--invalid .ProcessFlow-message {
+    color: var(--ProcessFlow-invalid);
+}
+
+/*
+ * The live region, hidden with the clip-rect idiom rather than `display: none`
+ * or `visibility: hidden` — both of those remove it from the accessibility tree
+ * along with the layout, which is the usual reason a live region is silent.
+ */
+.ProcessFlow .ProcessFlow-announcer {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- disabled */
+
+/*
+ * Not `opacity`. Dimming drags the label below contrast along with the chrome,
+ * and disabled here is a permanent state rather than a transient one — so the
+ * text would sit under-contrast for as long as the form is read-only.
+ * Recolour instead, the way Fluent does.
+ */
+.ProcessFlow--disabled .ProcessFlow-label {
+    color: var(--ProcessFlow-foreground-disabled);
+}
+
+.ProcessFlow--disabled .ProcessFlow-step::before {
+    background-color: var(--ProcessFlow-rail-disabled);
+}
+
+/* -------------------------------------------------------------------- dark */
+
+/*
+ * Only the fallbacks change. A host that emits the tokens is already handing
+ * over its own dark values through the `var()`, and this block never takes
+ * effect there — which is what stops the class fighting a host that knows its
+ * own theme better than this control does.
+ */
+.ProcessFlow--dark {
+    --ProcessFlow-foreground: var(--colorNeutralForeground1, #ffffff);
+    --ProcessFlow-foreground-muted: var(--colorNeutralForeground4, #999999);
+    --ProcessFlow-foreground-disabled: var(--colorNeutralForegroundDisabled, #5c5c5c);
+    --ProcessFlow-surface: var(--colorNeutralBackground1, #292929);
+    --ProcessFlow-rail: var(--colorNeutralStroke1, #666666);
+    --ProcessFlow-rail-disabled: var(--colorNeutralStrokeDisabled, #424242);
+    --ProcessFlow-invalid: var(--colorPaletteRedForeground1, #e37d80);
+    --ProcessFlow-focus-outer: var(--colorStrokeFocus2, #ffffff);
+    --ProcessFlow-focus-inner: var(--colorStrokeFocus1, #000000);
+}
+
+.ProcessFlow--dark .ProcessFlow-node--current .ProcessFlow-label {
+    background-color: var(--colorNeutralBackground3, #141414);
+}
+
+/* ---------------------------------------------------------------- a11y ---- */
+
+/*
+ * Forced colours replace every background-color with the system Canvas, so
+ * anything carrying meaning by tint alone becomes invisible. The three states
+ * already differ by shape, and these rules give the shapes a system colour to
+ * be drawn in — without them the whole bar is a row of nothing.
+ */
+@media (forced-colors: active) {
+    .ProcessFlow .ProcessFlow-marker {
+        border-color: ButtonBorder;
+        background-color: Canvas;
+    }
+
+    .ProcessFlow .ProcessFlow-node--done .ProcessFlow-marker,
+    .ProcessFlow .ProcessFlow-node--current .ProcessFlow-marker {
+        border-color: Highlight;
+    }
+
+    .ProcessFlow .ProcessFlow-node--current .ProcessFlow-marker::after {
+        background-color: Highlight;
+    }
+
+    /*
+     * The tick is `fill: var(--ProcessFlow-step-glyph)`, a custom property
+     * forced colours does not touch, so it has to be pointed at a system colour
+     * by hand or the one glyph that distinguishes done from current disappears.
+     */
+    .ProcessFlow .ProcessFlow-check {
+        fill: CanvasText;
+    }
+
+    .ProcessFlow .ProcessFlow-step::before {
+        background-color: ButtonBorder;
+    }
+
+    .ProcessFlow .ProcessFlow-step.is-linked::before {
+        background-color: Highlight;
+    }
+
+    .ProcessFlow .ProcessFlow-node--current .ProcessFlow-label {
+        background-color: Canvas;
+        /* The tab's shape is the only thing left saying which stage is current. */
+        outline: 1px solid CanvasText;
+    }
+
+    .ProcessFlow--disabled .ProcessFlow-label,
+    .ProcessFlow--disabled .ProcessFlow-step::before {
+        color: GrayText;
+        background-color: GrayText;
+    }
+
+    .ProcessFlow--disabled .ProcessFlow-label {
+        background-color: Canvas;
+    }
+}
+
+/*
+ * Shortened, not removed. The transition is decoration; the state change it
+ * animates is not, so the colour must still arrive — it just stops travelling
+ * to get there.
+ */
+@media screen and (prefers-reduced-motion: reduce) {
+    .ProcessFlow .ProcessFlow-marker,
+    .ProcessFlow .ProcessFlow-step::before {
+        transition-duration: 0.01ms;
+    }
+}

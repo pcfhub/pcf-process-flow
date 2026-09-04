@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Display names and descriptions for everything declared in
+    ControlManifest.Input.xml. PCFHub reads the manifest, so these strings are
+    what appear in the component's API reference on the hub as well as in the
+    maker's properties pane.
+
+    Copy this file to add a language — ProcessFlow.3082.resx for Spanish, and so
+    on — then list it under <resources> in the manifest.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="ProcessFlow_Name" xml:space="preserve">
+    <value>Flux de processus</value>
+  </data>
+  <data name="ProcessFlow_Desc" xml:space="preserve">
+    <value>Une colonne de choix sous forme de barre d'étapes de flux des processus d'entreprise.</value>
+  </data>
+  <data name="Value_Name" xml:space="preserve">
+    <value>Valeur</value>
+  </data>
+  <data name="Value_Desc" xml:space="preserve">
+    <value>La colonne de choix (simple ou à sélection multiple) que ce contrôle lit et écrit. L'ordre de ses options est l'ordre des étapes.</value>
+  </data>
+  <data name="Options_Name" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="Options_Desc" xml:space="preserve">
+    <value>Remplace les options de la colonne. JSON, ou la forme abrégée 1:Qualifier:#E8502A, 2:Développer. Obligatoire dans les applications canevas, qui ne publient aucune métadonnée de colonne.</value>
+  </data>
+  <data name="Exclude_Name" xml:space="preserve">
+    <value>Étapes masquées</value>
+  </data>
+  <data name="Exclude_Desc" xml:space="preserve">
+    <value>Options à ne pas afficher sur la barre, séparées par des virgules. Accepte les valeurs ou les libellés. Une option masquée déjà détenue par un enregistrement est conservée, pas effacée.</value>
+  </data>
+  <data name="DefaultColor_Name" xml:space="preserve">
+    <value>Couleur par défaut</value>
+  </data>
+  <data name="DefaultColor_Desc" xml:space="preserve">
+    <value>La couleur d'une option dont les métadonnées n'en comportent aucune. Par défaut, l'orange du flux des processus d'entreprise.</value>
+  </data>
+  <data name="ProcessFlow_NoAccess" xml:space="preserve">
+    <value>Vous n'avez pas accès à cette valeur.</value>
+  </data>
+  <data name="ProcessFlow_NoSteps" xml:space="preserve">
+    <value>Aucune étape à afficher.</value>
+  </data>
+  <data name="ProcessFlow_NoStage" xml:space="preserve">
+    <value>Aucune étape atteinte</value>
+  </data>
+  <data name="ProcessFlow_StateDone" xml:space="preserve">
+    <value>terminé</value>
+  </data>
+  <data name="ProcessFlow_StateCurrent" xml:space="preserve">
+    <value>étape en cours</value>
+  </data>
+  <data name="ProcessFlow_StateFuture" xml:space="preserve">
+    <value>non atteint</value>
+  </data>
+</root>

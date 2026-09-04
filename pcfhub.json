@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+
+  "slug": "pcf-process-flow",
+  "name": "Process Flow",
+  "tagline": "A choice column as a Business Process Flow stage bar.",
+  "category": "display",
+  "tags": [
+    "optionset",
+    "choices",
+    "process",
+    "status",
+    "themeable",
+    "accessible"
+  ],
+
+  "control": {
+    "namespace": "PCFHub",
+    "constructor": "ProcessFlow",
+    "type": "field",
+    "framework": "standard",
+    "manifestPath": "ProcessFlow/ControlManifest.Input.xml"
+  },
+
+  "links": {
+    "homepage": "https://github.com/pcfhub/pcf-process-flow",
+    "support": "https://github.com/pcfhub/pcf-process-flow/issues",
+    "license": "MIT"
+  },
+
+  "docs": {
+    "path": "docs"
+  },
+
+  "media": {
+    "logo": "media/logo.png",
+    "screenshots": [
+      "media/screenshot.png"
+    ]
+  },
+
+  "demo": {
+    "fidelity": "full",
+    "host": "form",
+    "bundle": "out/controls/ProcessFlow/bundle.js",
+    "styles": [
+      "out/controls/ProcessFlow/css/ProcessFlow.css"
+    ],
+    "presets": [
+      {
+        "slug": "sales-stages",
+        "name": "Sales stages",
+        "description": "The familiar flow: two stages behind, one in progress, one ahead. Click a stage to move the record.",
+        "isDefault": true,
+        "props": {
+          "value": [1, 2, 3],
+          "options": "1:Qualify, 2:Develop, 3:Propose, 4:Close",
+          "exclude": null,
+          "defaultColor": "#E8502A"
+        }
+      },
+      {
+        "slug": "coloured",
+        "name": "Colours from the options",
+        "description": "Each stage drawn in its own choice colour. The tick flips between black and white so it stays readable on any of them.",
+        "props": {
+          "value": [1, 2, 3, 4],
+          "options": "[{\"Value\":1,\"Label\":\"Intake\",\"Color\":\"#0F6CBD\"},{\"Value\":2,\"Label\":\"Triage\",\"Color\":\"#FFD166\"},{\"Value\":3,\"Label\":\"In progress\",\"Color\":\"#107C10\"},{\"Value\":4,\"Label\":\"Review\",\"Color\":\"#5B2D90\"},{\"Value\":5,\"Label\":\"Closed\",\"Color\":\"#C4314B\"}]",
+          "exclude": null,
+          "defaultColor": "#E8502A"
+        }
+      },
+      {
+        "slug": "non-contiguous",
+        "name": "Steps marked out of sequence",
+        "description": "A Multi-Select Choice column, so the marks are explicit rather than implied. The last marked stage in option order is the current one.",
+        "props": {
+          "value": [1, 3],
+          "options": "1:Draft, 2:Legal review, 3:Signed, 4:Invoiced, 5:Paid",
+          "exclude": null,
+          "defaultColor": "#E8502A"
+        }
+      },
+      {
+        "slug": "hidden-steps",
+        "name": "Hidden steps",
+        "description": "Cancelled and On hold are named in the exclude list, so they never appear — and a record holding one keeps it. Clear the exclude box to see them.",
+        "props": {
+          "value": [1, 2, 6],
+          "options": "1:New, 2:Assigned, 3:Working, 4:Resolved, 5:On hold, 6:Cancelled",
+          "exclude": "On hold, Cancelled",
+          "defaultColor": "#E8502A"
+        }
+      },
+      {
+        "slug": "single-choice",
+        "name": "A plain Choice column",
+        "description": "One stored value, so the stages before it read as completed — the way a native process flow does. Clicking a stage moves the record rather than adding to it.",
+        "props": {
+          "value": 2,
+          "options": "1:Prospect, 2:Qualified, 3:Proposal, 4:Negotiation, 5:Won",
+          "exclude": null,
+          "defaultColor": "#0F6CBD"
+        }
+      },
+      {
+        "slug": "empty",
+        "name": "Nothing reached yet",
+        "description": "An empty column. Every stage is ahead of the record, and the bar says so rather than looking broken.",
+        "props": {
+          "value": null,
+          "options": "1:Qualify, 2:Develop, 3:Propose, 4:Close",
+          "exclude": null,
+          "defaultColor": "#E8502A"
+        }
+      }
+    ]
+  }
+}

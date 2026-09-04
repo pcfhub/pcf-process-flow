@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    Display names and descriptions for everything declared in
+    ControlManifest.Input.xml. PCFHub reads the manifest, so these strings are
+    what appear in the component's API reference on the hub as well as in the
+    maker's properties pane.
+
+    Copy this file to add a language — ProcessFlow.3082.resx for Spanish, and so
+    on — then list it under <resources> in the manifest.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="ProcessFlow_Name" xml:space="preserve">
+    <value>プロセス フロー</value>
+  </data>
+  <data name="ProcessFlow_Desc" xml:space="preserve">
+    <value>選択列をビジネス プロセス フローのステージ バーとして表示します。</value>
+  </data>
+  <data name="Value_Name" xml:space="preserve">
+    <value>値</value>
+  </data>
+  <data name="Value_Desc" xml:space="preserve">
+    <value>このコントロールが読み書きする選択列 (単一または複数選択)。オプションの順序がステップの順序になります。</value>
+  </data>
+  <data name="Options_Name" xml:space="preserve">
+    <value>オプション</value>
+  </data>
+  <data name="Options_Desc" xml:space="preserve">
+    <value>列のオプションを上書きします。JSON、または短縮形 1:見込み評価:#E8502A, 2:商談化。列メタデータを公開しないキャンバス アプリでは必須です。</value>
+  </data>
+  <data name="Exclude_Name" xml:space="preserve">
+    <value>非表示のステップ</value>
+  </data>
+  <data name="Exclude_Desc" xml:space="preserve">
+    <value>バーに表示しないオプションをコンマ区切りで指定します。値またはラベルを使用できます。レコードが既に保持している非表示のオプションは保持され、削除されません。</value>
+  </data>
+  <data name="DefaultColor_Name" xml:space="preserve">
+    <value>既定の色</value>
+  </data>
+  <data name="DefaultColor_Desc" xml:space="preserve">
+    <value>メタデータに色がないオプションに使用する色。既定はビジネス プロセス フローのオレンジです。</value>
+  </data>
+  <data name="ProcessFlow_NoAccess" xml:space="preserve">
+    <value>この値にアクセスする権限がありません。</value>
+  </data>
+  <data name="ProcessFlow_NoSteps" xml:space="preserve">
+    <value>表示するステップがありません。</value>
+  </data>
+  <data name="ProcessFlow_NoStage" xml:space="preserve">
+    <value>到達したステージなし</value>
+  </data>
+  <data name="ProcessFlow_StateDone" xml:space="preserve">
+    <value>完了</value>
+  </data>
+  <data name="ProcessFlow_StateCurrent" xml:space="preserve">
+    <value>現在のステージ</value>
+  </data>
+  <data name="ProcessFlow_StateFuture" xml:space="preserve">
+    <value>未到達</value>
+  </data>
+</root>
