@@ -1,0 +1,48 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- A stage bar: two stages behind, one still ahead.
+
+       The control draws a choice column as a Business Process Flow stage bar,
+       and the interlocking chevron is that bar's own shape. Nothing else in
+       this account is chevron cells, so the silhouette alone identifies it in a
+       gallery.
+
+       The ramp is the PCFHub mark's own, verbatim, so this sits in the family rather
+       than beside it. Declared in userSpaceOnUse and spanning the whole 96
+       canvas, so the mark reads as one object lit from the top right.
+
+       The last cell is an outline rather than a paler fill. Filled at 0.38 it
+       is legible and it is also just a lighter cell; stroked, it is visibly
+       EMPTY, which is what a stage nobody has reached looks like. Same reason
+       pcf-choices-picker outlines its unpicked box: a hole reads at 24, a tint
+       does not.
+
+       Drawn for 32px, and the gap is the fragile part. The cells clear each
+       other by 7 units measured at BOTH the top edge and the point, which is
+       what keeps the gap parallel down the diagonal; measured only at the point
+       it closes up at the top. The filled cells therefore carry no rounding
+       stroke: at width 3 it would eat 3 of those 7 units and the bar becomes
+       one shape at 24. Sharp corners are also what a real stage bar has.
+
+       Three attempts are recorded because each was a different wrong reading. A
+       stepper, circles on a connector with checks in them, is what this
+       repository shipped before and it does not survive the size: at 32 the
+       circles are 9px, the checks inside them are gone, and the mark is a chain
+       of beads. One rounded bar with three white chevrons inside it is a MEDIA
+       CONTROL, read as fast forward. A white dot marking the current stage sits
+       on the boundary between two cells and reads as a bullet that fell in.
+
+       Note: no double hyphen may appear in this comment, or the whole document
+       fails to parse as XML. -->
+  <defs>
+    <linearGradient id="process-flow-ramp" x1="8" y1="80" x2="88" y2="16" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A684FF"/><stop offset="0.6" stop-color="#7C86FF"/><stop offset="1" stop-color="#00BCFF"/>
+    </linearGradient>
+  </defs>
+  <!-- Two stages done. No rounding stroke: it would close the gap. -->
+  <path d="M11 27 H28 L36 48 L28 69 H11 Z" fill="url(#process-flow-ramp)"/>
+  <path d="M35 27 H52 L60 48 L52 69 H35 L43 48 Z" fill="url(#process-flow-ramp)"/>
+
+  <!-- One to go. -->
+  <path d="M62 30 H76 L82 48 L76 66 H62 L68 48 Z"
+        fill="none" stroke="url(#process-flow-ramp)" stroke-width="7" stroke-linejoin="round"/>
+</svg>
