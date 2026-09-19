@@ -5,6 +5,7 @@
   "name": "Process Flow",
   "tagline": "A choice column as a Business Process Flow stage bar.",
   "category": "display",
+  "hosts": ["canvas", "model-driven"],
   "tags": [
     "optionset",
     "choices",
