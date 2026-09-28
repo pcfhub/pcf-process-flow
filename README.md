@@ -74,9 +74,13 @@ optimism: the control reaches no Web API, no device API and no navigation, so
 there is nothing the hub's harness has to fake. Every user-visible path works in
 the demo exactly as it does on a form.
 
-The one thing the harness cannot supply is column metadata — its `baseAttributes()`
-returns no `Options` — so every preset carries the `options` input, which is
-also what a canvas app needs. That is a property a maker sets, not a stub.
+*Sales stages* and *Nothing reached yet* read their steps from the column itself.
+`demo/records.json` carries a stand-in Dataverse that describes the bound column's
+options, which the harness hands over as `value.attributes.Options`, as a
+model-driven form does (pcfhub/pcfhub#52). The other presets carry the `options`
+input instead. That is what a canvas app needs, and how a maker relabels,
+recolours or reorders the steps. A demo has one fixture, so one described
+column.
 
 The presets cover: the sales-stage bar from a bare column, per-option colours
 including a pale one that flips the tick to black, marks made out of sequence on

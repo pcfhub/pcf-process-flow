@@ -139,10 +139,24 @@ no `feature-usage` entries at all, so no Web API, no `Utility`, no device and no
 navigation. Nothing user-visible leaves the browser, and there is nothing for
 the harness to fake.
 
-The one thing the harness cannot supply is column metadata — its
-`baseAttributes()` returns no `Options` — so every preset carries the `options`
-input. That is a property a maker sets rather than a stub, and it is the same
-property a canvas app requires, so the demo is showing a real configuration.
+Until 2026-09-28 the harness could not supply column metadata: its
+`baseAttributes()` returned no `Options`. So every preset carried the `options`
+input, the property a canvas app requires.
+
+pcfhub/pcfhub#52 let a fixture describe its columns. `demo/records.json`, which
+holds only a `dataverse` section as a field control's fixture does, describes
+`cr123_stages` on the form record's table, a multi-select of Qualify, Develop,
+Propose and Close, and binds `value` to it. *Sales stages* and *Nothing reached
+yet* now leave `options` empty and take the step order from
+`attributes.Options`, the model-driven route. The others keep `options`.
+
+It was checked with 0.1.2's published bundle against that harness, before the
+push:
+
+- *Sales stages* drew Qualify and Develop completed, Propose current and Close
+  not reached;
+- clicking Close output `value: [1, 2, 3, 4]`;
+- *Nothing reached yet* drew all four not reached.
 
 ## Not verified
 

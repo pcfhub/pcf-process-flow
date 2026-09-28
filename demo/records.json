@@ -1,0 +1,30 @@
+{
+    "dataverse": {
+        "record": {
+            "entityType": "opportunity",
+            "id": "3b7e9d21-5c4a-4f6e-9d8b-7a6c5e4d3f21",
+            "name": "Fabrikam renewal"
+        },
+        "tables": {
+            "opportunity": {
+                "entitySet": "opportunities",
+                "primaryId": "opportunityid",
+                "primaryName": "name",
+                "columns": {
+                    "cr123_stages": {
+                        "type": "MultiSelectOptionSet",
+                        "options": [
+                            { "value": 1, "label": "Qualify" },
+                            { "value": 2, "label": "Develop" },
+                            { "value": 3, "label": "Propose" },
+                            { "value": 4, "label": "Close" }
+                        ]
+                    }
+                }
+            }
+        },
+        "boundColumns": {
+            "value": "cr123_stages"
+        }
+    }
+}

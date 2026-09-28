@@ -47,15 +47,16 @@
     "styles": [
       "out/controls/ProcessFlow/css/ProcessFlow.css"
     ],
+    "datasetFixture": "demo/records.json",
     "presets": [
       {
         "slug": "sales-stages",
         "name": "Sales stages",
-        "description": "The familiar flow: two stages behind, one in progress, one ahead. Click a stage to move the record.",
+        "description": "The familiar flow: two stages behind, one in progress, one ahead, the steps read from the column itself with Options left empty. Click a stage to move the record.",
         "isDefault": true,
         "props": {
           "value": [1, 2, 3],
-          "options": "1:Qualify, 2:Develop, 3:Propose, 4:Close",
+          "options": "",
           "exclude": null,
           "defaultColor": "#E8502A"
         }
@@ -107,10 +108,10 @@
       {
         "slug": "empty",
         "name": "Nothing reached yet",
-        "description": "An empty column. Every stage is ahead of the record, and the bar says so rather than looking broken.",
+        "description": "An empty column, the same one Sales stages reads. Every stage is ahead of the record, and the bar says so rather than looking broken.",
         "props": {
           "value": null,
-          "options": "1:Qualify, 2:Develop, 3:Propose, 4:Close",
+          "options": "",
           "exclude": null,
           "defaultColor": "#E8502A"
         }
