@@ -4,6 +4,7 @@
   "slug": "pcf-process-flow",
   "name": "Process Flow",
   "tagline": "A choice column as a Business Process Flow stage bar.",
+  "summary": "Draws a Choice or Multi-Select Choice column as a business process flow stage bar: completed stages ticked, a ring on the current one, the rest hollow. Clicking a stage writes the column.\n\nIt gives a status column the look of a process without the separate Dataverse construct a real Business Process Flow is, so there is nothing to provision or migrate. On a model-driven form it reads the column's options, order and colours itself; in a canvas app the steps are supplied through the `options` property.",
   "category": "display",
   "hosts": ["canvas", "model-driven"],
   "tags": [
