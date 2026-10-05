@@ -10,6 +10,10 @@ Draws a Choice or Multi-Select Choice column as a business process flow stage
 bar: circles joined by a coloured rail, ticks behind the record, a ring on the
 stage it is at, hollow circles ahead. Clicking a stage writes the column.
 
+:::callout{type=warning}
+**Reference example · built with AI.** This control was written with AI (Claude) and tested on a live Dataverse form; its code has not been reviewed line by line. It is published as a worked example and is not maintained — read the source and [SPEC.md](https://github.com/pcfhub/pcf-process-flow/blob/main/SPEC.md) (what was measured on the form) before you use it. Fixes are not guaranteed.
+:::
+
 ::image{src=media/screenshot.png alt="Process Flow on three forms: a plain sales stage bar, per-option colours, and the dark theme with a step hidden" zoom}
 
 ## Why this one
