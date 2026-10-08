@@ -244,7 +244,7 @@ if (typeof registration.ctor !== 'function') {
  * ======================================================================== */
 
 /** The step buttons, in the order they were rendered. */
-const nodes = (handle) => handle.container.querySelectorAll('button.ProcessFlow-node');
+const nodes = (handle) => Array.from(handle.container.querySelectorAll('button.ProcessFlow-node'));
 
 /**
  * The <li> around each node.
@@ -254,7 +254,7 @@ const nodes = (handle) => handle.container.querySelectorAll('button.ProcessFlow-
  * be read by it — properties inherit downward only. So this is where the colour
  * assertions have to look.
  */
-const items = (handle) => handle.container.querySelectorAll('li.ProcessFlow-step');
+const items = (handle) => Array.from(handle.container.querySelectorAll('li.ProcessFlow-step'));
 
 /** Each step's label text, in render order. */
 const labels = (handle) =>
